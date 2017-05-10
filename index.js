@@ -32,7 +32,10 @@ const rl = readline.createInterface({
 //Readline asks a question, and a callback is passes to the function.
 rl.question('How many MegaLights do you need to travel? ', function (distance) {
     rl.question('Would you like to only see starships with known MGLT values?(y/n)', function (yesOrNo) {
-        if(yesOrNo === "y") {
+        var yesRegex = 'y'||'yes';
+        var noRegex = 'n'|| 'no';
+        //Matching the Regex was found on http://stackoverflow.com/questions/177719/javascript-case-insensitive-search
+        if (yesOrNo.toLowerCase().indexOf(yesRegex) != -1) {
             makeStarshipRequests(pagesToRequest).then(function (starships) {
                 starships.forEach(function (starship, i) {
                     var numberOfStops = getNumberOfStops(distance, starship.consumables, starship.MGLT);
@@ -40,7 +43,7 @@ rl.question('How many MegaLights do you need to travel? ', function (distance) {
                 })
             });
         }
-        else if(yesOrNo === "n") {
+        else if(yesOrNo.toLowerCase().indexOf(noRegex) != -1) {
             makeStarshipRequests(pagesToRequest).then(function (starships) {
                 starships.forEach(function (starship) {
                     if(starship.MGLT !== "unknown") {
@@ -49,6 +52,9 @@ rl.question('How many MegaLights do you need to travel? ', function (distance) {
                     }
                 })
             });
+        }
+        else {
+            console.log("You should have entered either Y or N")
         }
         rl.close();
     });
