@@ -1,8 +1,8 @@
 /**
  * Created by Daniel on 5/10/2017.
  */
-const swapi = require('swapi-node');
 const readline = require('readline');
+var swapiLib = require('./swapiLib');
 
 /*
 As Swapi does not return all pages at once, I wanted to create a more performant way of making requests to the API.
@@ -29,25 +29,26 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-//Readline asks a question, and a callback is passes to the function.
+//Readline asks a question, and a callback is passed to the function.
 rl.question('How many MegaLights do you need to travel? ', function (distance) {
     rl.question('Would you like to only see starships with known MGLT values?(y/n)', function (yesOrNo) {
         var yesRegex = 'y'||'yes';
         var noRegex = 'n'|| 'no';
         //Matching the Regex was found on http://stackoverflow.com/questions/177719/javascript-case-insensitive-search
         if (yesOrNo.toLowerCase().indexOf(yesRegex) != -1) {
-            makeStarshipRequests(pagesToRequest).then(function (starships) {
+            swapiLib.makeStarshipRequests(pagesToRequest).then(function (starships) {
+                console.log(starships);
                 starships.forEach(function (starship, i) {
-                    var numberOfStops = getNumberOfStops(distance, starship.consumables, starship.MGLT);
+                    var numberOfStops = swapiLib.getNumberOfStops(distance, starship.consumables, starship.MGLT);
                     console.log("index: " + i + "| Name: " + starship.name + "| Resupplies Required :" + numberOfStops)
                 })
             });
         }
         else if(yesOrNo.toLowerCase().indexOf(noRegex) != -1) {
-            makeStarshipRequests(pagesToRequest).then(function (starships) {
+            swapiLib.makeStarshipRequests(pagesToRequest).then(function (starships) {
                 starships.forEach(function (starship) {
                     if(starship.MGLT !== "unknown") {
-                        var numberOfStops = getNumberOfStops(distance, starship.consumables, starship.MGLT);
+                        var numberOfStops = swapiLib.getNumberOfStops(distance, starship.consumables, starship.MGLT);
                         console.log("Name: " + starship.name + "| Resupplies Required :" + numberOfStops)
                     }
                 })
@@ -60,84 +61,3 @@ rl.question('How many MegaLights do you need to travel? ', function (distance) {
     });
 
 });
-
-function getNumberOfStops(distance, consumables, MGLT) {
-    if(MGLT === "unknown") {
-        return "NO MGLT VALUE";
-    } else {
-        var tripDuration = distance/parseInt(MGLT);
-        var tripDurationBeforeResupply = getAmountOfHoursBeforeResupplies(consumables);
-        if( tripDurationBeforeResupply === "N/A") {
-            return "CONSUMABLE INFORMATION NOT AVAILABLE";
-        } else {
-            return parseInt(tripDuration / tripDurationBeforeResupply);
-        }
-    }
-
-}
-
-function getAmountOfHoursBeforeResupplies(consumables) {
-    var year = "year"||"years";
-    var month = "month" || "months";
-    var week = "week" || "weeks";
-    var day = "day" || "days";
-    var hour = "hour" || "hours";
-    var number = parseInt(consumables.replace ( /[^\d.]/g, '' ));
-    if(consumables === "unknown")
-        return "N/A";
-    if(consumables.includes(hour)) {
-        return number;
-    }
-    else if (consumables.includes(day)){
-        return number*24;
-    }
-    else if (consumables.includes(week)){
-        return number*24*7;
-    }
-    else if (consumables.includes(month)){
-        return Math.round(number*24*30.44);
-    }
-    else if (consumables.includes(year)){
-        return Math.round(number*24*365.2422);
-    }
-    else
-        return "ERROR";
-}
-
-function makeStarshipRequests(pages) {
-    //Return a new promise.
-    return new Promise(function (resolve, reject) {
-        var starshipList = [];
-        var pageFound404 = false;
-        return Promise.all(pages.map(function (page) {
-            return swapi.get('http://swapi.co/api/starships/?page1=&page='+ page).then(function (starships) {
-                starships.results.map(function (starship) {
-                    starshipList.push(starship);
-                });
-            }).catch(function (err) {
-                if(err.error = 404) {
-                    pageFound404 = true;
-                }
-                else {
-                    console.log("There was an error found that was not expected:");
-                    console.log(err);
-                    reject(err)
-                }
-            })
-        })).then(function () {
-            if(!pageFound404) {
-                var newPages = [];
-                for(var i =1; i <=pages.length; i++) {
-                    newPages.push(pages[pages.length - 1] + i);
-                }
-                return makeStarshipRequests(newPages).then(function (starships) {
-                    Promise.all(starships.map(function (starship) {
-                        starshipList.push(starship);
-                    }));
-                });
-            }
-        }).then(function () {
-            return resolve(starshipList);
-        })
-    })
-}
