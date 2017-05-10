@@ -23,33 +23,48 @@ If the pagesToRequest array(below) was made to be 2 in length- [1,2], then the r
 */
 var pagesToRequest = [1,2,3];
 
+//The readline interface is created here. The application does not close until the interface is closed.
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
-
+//Readline asks a question, and a callback is passes to the function.
 rl.question('How many MegaLights do you need to travel? ', function (distance) {
-    console.log('The desired distance is:' + distance);
-    makeStarshipRequests(pagesToRequest).then(function (starships) {
-        starships.forEach(function (starship, i ) {
-            var numberOfStops = getNumberOfStops(distance, starship.consumables, parseInt(starship.MGLT));
-            console.log("index: " + i + "| Name: "+ starship.name + "| Resupplies Required :" + numberOfStops)
-        })
+    rl.question('Would you like to only see starships with known MGLT values?(y/n)', function (yesOrNo) {
+        if(yesOrNo === "y") {
+            makeStarshipRequests(pagesToRequest).then(function (starships) {
+                starships.forEach(function (starship, i) {
+                    var numberOfStops = getNumberOfStops(distance, starship.consumables, starship.MGLT);
+                    console.log("index: " + i + "| Name: " + starship.name + "| Resupplies Required :" + numberOfStops)
+                })
+            });
+        }
+        else if(yesOrNo === "n") {
+            makeStarshipRequests(pagesToRequest).then(function (starships) {
+                starships.forEach(function (starship) {
+                    if(starship.MGLT !== "unknown") {
+                        var numberOfStops = getNumberOfStops(distance, starship.consumables, starship.MGLT);
+                        console.log("Name: " + starship.name + "| Resupplies Required :" + numberOfStops)
+                    }
+                })
+            });
+        }
+        rl.close();
     });
-    rl.close();
+
 });
 
 function getNumberOfStops(distance, consumables, MGLT) {
     if(MGLT === "unknown") {
         return "NO MGLT VALUE";
     } else {
-        var hoursSpentTraveling = distance/MGLT;
-        var numberofHoursBeforeResupply = getAmountOfHoursBeforeResupplies(consumables);
-        if( numberofHoursBeforeResupply === "N/A") {
-            return numberofHoursBeforeResupply;
+        var tripDuration = distance/parseInt(MGLT);
+        var tripDurationBeforeResupply = getAmountOfHoursBeforeResupplies(consumables);
+        if( tripDurationBeforeResupply === "N/A") {
+            return "CONSUMABLE INFORMATION NOT AVAILABLE";
         } else {
-            return parseInt(hoursSpentTraveling / numberofHoursBeforeResupply);
+            return parseInt(tripDuration / tripDurationBeforeResupply);
         }
     }
 
@@ -74,10 +89,10 @@ function getAmountOfHoursBeforeResupplies(consumables) {
         return number*24*7;
     }
     else if (consumables.includes(month)){
-        return number*24*30.44;
+        return Math.round(number*24*30.44);
     }
     else if (consumables.includes(year)){
-        return number*24*30.44*365.2422;
+        return Math.round(number*24*365.2422);
     }
     else
         return "ERROR";
