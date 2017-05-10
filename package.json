@@ -1,0 +1,26 @@
+{
+  "name": "kneatswapi",
+  "version": "1.0.0",
+  "description": "A console application for checking how many stops for re-supply are required by starships in the Star Wars universe when they are given a certain distance in MGLTs(MegaLights).",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danieloc/kneatSwapi.git"
+  },
+  "keywords": [
+    "Swapi"
+  ],
+  "author": "Daniel O'Connor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danieloc/kneatSwapi/issues"
+  },
+  "homepage": "https://github.com/danieloc/kneatSwapi#readme",
+  "dependencies": {
+    "swapi-node": "^0.4.1"
+  }
+}
