@@ -2,6 +2,7 @@
  * Created by Daniel on 5/10/2017.
  */
 const swapi = require('swapi-node');
+const readline = require('readline');
 
 /*
 As Swapi does not return all pages at once, I wanted to create a more performant way of making requests to the API.
@@ -22,15 +23,68 @@ If the pagesToRequest array(below) was made to be 2 in length- [1,2], then the r
 */
 var pagesToRequest = [1,2,3];
 
-makeStarshipRequests(pagesToRequest).then(function (starships) {
-    starships.forEach(function (starship, i ) {
-        console.log(i + ":" + starship.name);
-    })
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
 });
+
+
+rl.question('How many MegaLights do you need to travel? ', function (distance) {
+    console.log('The desired distance is:' + distance);
+    makeStarshipRequests(pagesToRequest).then(function (starships) {
+        starships.forEach(function (starship, i ) {
+            var numberOfStops = getNumberOfStops(distance, starship.consumables, parseInt(starship.MGLT));
+            console.log("index: " + i + "| Name: "+ starship.name + "| Resupplies Required :" + numberOfStops)
+        })
+    });
+    rl.close();
+});
+
+function getNumberOfStops(distance, consumables, MGLT) {
+    if(MGLT === "unknown") {
+        return "NO MGLT VALUE";
+    } else {
+        var hoursSpentTraveling = distance/MGLT;
+        var numberofHoursBeforeResupply = getAmountOfHoursBeforeResupplies(consumables);
+        if( numberofHoursBeforeResupply === "N/A") {
+            return numberofHoursBeforeResupply;
+        } else {
+            return parseInt(hoursSpentTraveling / numberofHoursBeforeResupply);
+        }
+    }
+
+}
+
+function getAmountOfHoursBeforeResupplies(consumables) {
+    var year = "year"||"years";
+    var month = "month" || "months";
+    var week = "week" || "weeks";
+    var day = "day" || "days";
+    var hour = "hour" || "hours";
+    var number = parseInt(consumables.replace ( /[^\d.]/g, '' ));
+    if(consumables === "unknown")
+        return "N/A";
+    if(consumables.includes(hour)) {
+        return number;
+    }
+    else if (consumables.includes(day)){
+        return number*24;
+    }
+    else if (consumables.includes(week)){
+        return number*24*7;
+    }
+    else if (consumables.includes(month)){
+        return number*24*30.44;
+    }
+    else if (consumables.includes(year)){
+        return number*24*30.44*365.2422;
+    }
+    else
+        return "ERROR";
+}
 
 function makeStarshipRequests(pages) {
     //Return a new promise.
-    console.log("Starting requests for Starships");
     return new Promise(function (resolve, reject) {
         var starshipList = [];
         var pageFound404 = false;
@@ -55,7 +109,6 @@ function makeStarshipRequests(pages) {
                 for(var i =1; i <=pages.length; i++) {
                     newPages.push(pages[pages.length - 1] + i);
                 }
-                console.log("Starting new Promise");
                 return makeStarshipRequests(newPages).then(function (starships) {
                     Promise.all(starships.map(function (starship) {
                         starshipList.push(starship);

@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/danieloc/kneatSwapi#readme",
   "dependencies": {
+    "request": "^2.81.0",
     "swapi-node": "^0.4.1"
   }
 }
