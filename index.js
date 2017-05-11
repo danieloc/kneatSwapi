@@ -18,7 +18,7 @@ function askQuestions() {
         var regex=/^[0-9]+$/;
         if(distance.match(regex)) {
             rl.question('Would you like to only see starships with known MGLT values?(y/n)', function (showUnknownMGLT) {
-                //The "makeStarshipRequests" takes an array [1,2,3] that cause a fetch for pages 1 2 and 3 asynchronously from Swapi.co.
+                //The "makeStarshipRequests" takes an array [1,2,3] that cause a fetch for pages 1, 2 and 3 asynchronously from Swapi.co.
                 var pagesToRequest = [1, 2, 3];
                 //Matching the Regex was found on http://stackoverflow.com/questions/177719/javascript-case-insensitive-search
                 swapiLib.makeStarshipRequests(pagesToRequest).then(function (starships) {
@@ -39,7 +39,6 @@ function askQuestions() {
 }
 
 function askToContinue() {
-    console.log("Made it to ask a question");
     rl.question('Would you like to continue? (y/n): ', function (answer) {
         if(answer.toLowerCase().indexOf('y' || 'yes') !== -1) {
             console.log("--------------------------");
