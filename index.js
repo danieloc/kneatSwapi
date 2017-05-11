@@ -10,34 +10,50 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-//Readline asks a question, and a callback is passed to the function.
-rl.question('How many MegaLights do you need to travel? ', function (distance) {
-    rl.question('Would you like to only see starships with known MGLT values?(y/n)', function (yesOrNo) {
-        //The "makeStarshipRequests" takes an array [1,2,3] that cause a fetch for pages 1 2 and 3 asynchronously from Swapi.co.
-        var pagesToRequest = [1,2,3];
-        //Matching the Regex was found on http://stackoverflow.com/questions/177719/javascript-case-insensitive-search
-        if (yesOrNo.toLowerCase().indexOf('y'||'yes') != -1) {
-            swapiLib.makeStarshipRequests(pagesToRequest).then(function (starships) {
-                starships.forEach(function (starship) {
-                    var numberOfStops = swapiLib.getNumberOfStops(distance, starship.consumables, starship.MGLT);
-                    console.log(starship.name + ": " + numberOfStops)
-                })
-            });
-        }
-        else if(yesOrNo.toLowerCase().indexOf('n'|| 'no') != -1) {
-            swapiLib.makeStarshipRequests(pagesToRequest).then(function (starships) {
-                starships.forEach(function (starship) {
-                    if(starship.MGLT !== "unknown") {
-                        var numberOfStops = swapiLib.getNumberOfStops(distance, starship.consumables, starship.MGLT);
-                        console.log(starship.name + ": " + numberOfStops)
-                    }
-                })
+askQuestions();
+
+function askQuestions() {
+    //Readline asks a question, and a callback is passed to the function.
+    rl.question('How many MegaLights do you need to travel?(No Decimal Points)', function (distance) {
+        var regex=/^[0-9]+$/;
+        if(distance.match(regex)) {
+            rl.question('Would you like to only see starships with known MGLT values?(y/n)', function (showUnknownMGLT) {
+                //The "makeStarshipRequests" takes an array [1,2,3] that cause a fetch for pages 1 2 and 3 asynchronously from Swapi.co.
+                var pagesToRequest = [1, 2, 3];
+                //Matching the Regex was found on http://stackoverflow.com/questions/177719/javascript-case-insensitive-search
+                swapiLib.makeStarshipRequests(pagesToRequest).then(function (starships) {
+                    Promise.all(starships.map(function (starship) {
+                        if (showUnknownMGLT.toLowerCase().indexOf('y' || 'yes') != -1||(showUnknownMGLT.toLowerCase().indexOf('n' || 'no') !== -1 && starship.MGLT !== "unknown")) {
+                            var numberOfStops = swapiLib.getNumberOfStops(distance, starship.consumables, starship.MGLT);
+                            console.log(starship.name + ": " + numberOfStops)
+                        }
+                    })).then(askToContinue());
+                });
             });
         }
         else {
-            console.log("You should have entered either Y or N")
+            console.log("Please restart the program and enter the desired distance in MGLT eg. 100000");
+            askToContinue();
         }
-        rl.close();
-    });
+    })
+}
 
-});
+function askToContinue() {
+    console.log("Made it to ask a question");
+    rl.question('Would you like to continue? (y/n): ', function (answer) {
+        if(answer.toLowerCase().indexOf('y' || 'yes') !== -1) {
+            console.log("--------------------------");
+            console.log("--------------------------");
+            console.log("--------------------------");
+            console.log("--------------------------");
+            askQuestions();
+        }
+        else if(answer.toLowerCase().indexOf('n' || 'no') !== -1) {
+            rl.close();
+        }
+        else {
+            console.log("Please enter either yes or no");
+            askToContinue();
+        }
+    })
+}
