@@ -45,6 +45,24 @@ module.exports = {
             return "ERROR";
     },
 
+
+    /*
+     As Swapi does not return all pages at once, I wanted to create a more performant way of making requests to the API.
+     Before - I created a function that acted asynchronously - requesting page 1, then 2 then 3 and checking if each of them had a "next" function.
+     |-----------|                                               (Returns Page 1) - Next Function
+                 |-----------|                                   (Returns Page 2) - Next Function
+                              |-------------|                    (Returns Page 3) - Next Function
+                                             |-------------|     (Returns Page 4) - No Next Function
+     I decided to make the requests in 3s. So that the requests would happen faster, and asynchronously
+     |-----------|                                               (Returns Page 1)
+     |-----------|                                               (Returns Page 2)
+     |-----------|                                               (Returns Page 3) - Has no 404 returned so requests pages 4,5 and 6
+                 |----------|                                    (Returns Page 4)
+                 |----------X                                    (Returns 404)
+                 |----------X                                    (Returns 404)    - Since a 404 has been returned, the application stops making requests.
+
+     If the pagesToRequest array was made to be 2 in length eg. [1,2], then the requests would be made in 2s instead of 3s.
+     */
     makeStarshipRequests: function makeStarshipRequests(pages) {
         //Return a new promise.
         return new Promise(function (resolve, reject) {
