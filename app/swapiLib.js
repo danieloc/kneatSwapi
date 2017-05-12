@@ -8,16 +8,16 @@ module.exports = {
             return "MGLT N/A";
         } else {
             var tripDuration = distance / parseInt(MGLT);
-            var tripDurationBeforeResupply = this.getAmountOfHoursBeforeResupplies(consumables);
-            if (tripDurationBeforeResupply === "N/A") {
+            var tripDurationBetweenResupplies = this.hoursBetweenResupplies(consumables);
+            if (tripDurationBetweenResupplies === "N/A") {
                 return "CONSUMABLE INFORMATION NOT AVAILABLE";
             } else {
-                return parseInt(tripDuration / tripDurationBeforeResupply);
+                return parseInt(tripDuration / tripDurationBetweenResupplies);
             }
         }
     },
 
-    getAmountOfHoursBeforeResupplies: function getAmountOfHoursBeforeResupplies(consumables) {
+    hoursBetweenResupplies: function hoursBetweenResupplies(consumables) {
         var year = "year" || "years";
         var month = "month" || "months";
         var week = "week" || "weeks";

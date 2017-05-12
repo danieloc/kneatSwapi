@@ -16,8 +16,8 @@ startApplication();
 function startApplication() {
     //Readline asks a question, and a callback is passed to the function.
     rl.question('How many MegaLights do you need to travel?(No Decimal Points)', function (distance) {
-        var regex=/^[0-9]+$/;
-        if(distance.match(regex)) {
+        var numberRegex=/^[0-9]+$/;
+        if(distance.match(numberRegex)) {
             rl.question('Would you like to only see starships with known MGLT values?(y/n)', function (showUnknownMGLT) {
                 //The "makeStarshipRequests" takes an array [1,2,3] that cause a fetch for pages 1, 2 and 3 asynchronously from Swapi.co.
                 var pagesToRequest = [1, 2, 3];
