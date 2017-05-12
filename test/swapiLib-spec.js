@@ -3,11 +3,11 @@
  */
 var request = require('supertest');
 var assert = require('assert');
-var swapiLib = require('../swapiLib');
+var swapiLib = require('../app/swapiLib');
 var chai = require('chai');
 var expect = chai.expect;
 
-//Check to see that the Database is functioning
+//Check to see that the API is functioning
 describe('GET DEATH STAR INFO', function() {
     var deathStar;
     it('Get Response from API', function(done) {
@@ -61,4 +61,3 @@ describe('MAKE ASYNCHRONOUS STARSHIP REQUESTS', function () {
         });
     });
 });
-

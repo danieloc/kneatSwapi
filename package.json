@@ -4,7 +4,7 @@
   "description": "A console application for checking how many stops for re-supply are required by starships in the Star Wars universe when they are given a certain distance in MGLTs(MegaLights).",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node app/index.js",
     "test": "node ./node_modules/mocha/bin/mocha --timeout 15000"
   },
   "repository": {
@@ -21,10 +21,6 @@
   },
   "homepage": "https://github.com/danieloc/kneatSwapi#readme",
   "dependencies": {
-    "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0",
-    "expect": "^1.20.2",
-    "express": "^4.15.2",
     "request": "^2.81.0",
     "swapi-node": "^0.4.1"
   },
