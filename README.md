@@ -10,7 +10,7 @@ A console application for checking how many stops for re-supply are required by 
 ## Running the Application.
 1. Use 'npm start' to start the program. 'node app/index.js' will also work.
 
-##Using the application
+## Using the application
 1. Enter the distance in MegaLights that you would like to travel.
 2. Specify whether you would like to include the starships with unknown speeds/MGLTs in your results(Y/N)
 3. View the starship results
