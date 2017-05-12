@@ -10,9 +10,10 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-askQuestions();
+//Application Starts Here
+startApplication();
 
-function askQuestions() {
+function startApplication() {
     //Readline asks a question, and a callback is passed to the function.
     rl.question('How many MegaLights do you need to travel?(No Decimal Points)', function (distance) {
         var regex=/^[0-9]+$/;
@@ -39,13 +40,13 @@ function askQuestions() {
 }
 
 function askToContinue() {
-    rl.question('Would you like to continue? (y/n): ', function (answer) {
+    rl.question('Would you like to continue/restart? (y/n): ', function (answer) {
         if(answer.toLowerCase().indexOf('y' || 'yes') !== -1) {
             console.log("--------------------------");
             console.log("--------------------------");
             console.log("--------------------------");
             console.log("--------------------------");
-            askQuestions();
+            startApplication();
         }
         else if(answer.toLowerCase().indexOf('n' || 'no') !== -1) {
             rl.close();

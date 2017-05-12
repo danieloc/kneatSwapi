@@ -5,7 +5,7 @@ const swapi = require('swapi-node');
 module.exports = {
     getNumberOfStops: function (distance, consumables, MGLT) {
         if (MGLT === "unknown") {
-            return "NO MGLT VALUE";
+            return "MGLT N/A";
         } else {
             var tripDuration = distance / parseInt(MGLT);
             var tripDurationBeforeResupply = this.getAmountOfHoursBeforeResupplies(consumables);
